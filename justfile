@@ -6,7 +6,7 @@ apps          := justfile_directory() + "/apps"
               
 browse        := if os() == "linux" { "xdg-open "} else { "open" }
 copy          := if os() == "linux" { "xsel -ib"} else { "pbcopy" }
-replace       := if os() == "linux" { "sed -i"} else { "sed -i '' -e" }
+replace       := "sed -i"
               
 argocd_port   := "30950"
                                  
@@ -16,11 +16,13 @@ default:
   just --list --unsorted
 
 # * setup kind cluster with crossplane, ArgoCD and launch argocd in browser
-setup: _replace_repo_user setup_kind setup_crossplane setup_argo launch_argo
+# setup: _replace_repo_user setup_kind setup_crossplane setup_argo launch_argo
+setup: setup_kind setup_crossplane setup_argo launch_argo
 
 # replace repo user
 _replace_repo_user:
   #!/usr/bin/env bash
+  set -x
   if grep -qw "Piotr1215" bootstrap.yaml && grep -qw "Piotr1215" {{apps}}/application_crossplane_resources.yaml; then
     if [[ -z "${GITHUB_USER}" ]]; then
       echo "Please set GITHUB_USER variable with your user name"
